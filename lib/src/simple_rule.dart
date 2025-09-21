@@ -1,73 +1,49 @@
 import 'package:analyzer/dart/ast/ast.dart';
-import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:analyzer/error/error.dart' hide LintCode;
+import 'package:analyzer/error/listener.dart';
+import 'package:custom_lint_builder/custom_lint_builder.dart';
 
-/// A simple rule that detects improper use of the 'late' keyword.
-/// Returns a list of error messages for violations.
-class SimpleLateRule {
-  static const String ruleName = 'no_improper_late_usage';
-  
-  /// Check the compilation unit and return error messages
-  List<LateError> check(CompilationUnit unit) {
-    final visitor = _SimpleLateVisitor();
-    unit.accept(visitor);
-    return visitor.errors;
-  }
-}
+/// A custom lint rule that detects improper use of the 'late' keyword.
+/// Only allows 'late' for lazy initialization with complex expressions.
+class NoImproperLateUsageRule extends DartLintRule {
+  NoImproperLateUsageRule() : super(code: _code);
 
-/// Represents an error in late usage
-class LateError {
-  final String message;
-  final int offset;
-  final int length;
-  final String variableName;
-
-  LateError({
-    required this.message,
-    required this.offset,
-    required this.length,
-    required this.variableName,
-  });
+  static const _code = LintCode(
+    name: 'no_improper_late_usage',
+    problemMessage: "The 'late' keyword should only be used for lazy initialization",
+    correctionMessage: 'Remove late keyword or use it only for complex lazy initialization.',
+    errorSeverity: ErrorSeverity.ERROR,
+  );
 
   @override
-  String toString() => '$message (at $variableName:$offset)';
-}
-
-class _SimpleLateVisitor extends RecursiveAstVisitor<void> {
-  final List<LateError> errors = [];
-
-  @override
-  void visitVariableDeclarationList(VariableDeclarationList node) {
-    super.visitVariableDeclarationList(node);
-    
-    if (node.lateKeyword != null) {
-      _checkLateUsage(node);
-    }
+  void run(
+    CustomLintResolver resolver,
+    ErrorReporter reporter,
+    CustomLintContext context,
+  ) {
+    context.registry.addVariableDeclarationList((node) {
+      if (node.lateKeyword != null) {
+        _checkLateUsage(node, reporter);
+      }
+    });
   }
 
-  void _checkLateUsage(VariableDeclarationList node) {
+  void _checkLateUsage(VariableDeclarationList node, ErrorReporter reporter) {
     for (final variable in node.variables) {
-      final variableName = variable.name.lexeme;
-      
       if (variable.initializer == null) {
         // This is a late declaration without initialization - NOT ALLOWED
-        errors.add(LateError(
-          message: "The 'late' keyword should only be used for lazy initialization. "
-              "Variable '$variableName' is declared late but not initialized.",
-          offset: variable.name.offset,
-          length: variable.name.length,
-          variableName: variableName,
-        ));
+        reporter.atNode(
+          variable,
+          _code,
+        );
       } else {
         // Check if the initializer is a simple literal
         final initializer = variable.initializer!;
         if (!_isLazyInitializer(initializer)) {
-          errors.add(LateError(
-            message: "The 'late' keyword should only be used for lazy initialization. "
-                "Variable '$variableName' uses 'late' with a simple value.",
-            offset: variable.name.offset,
-            length: variable.name.length,
-            variableName: variableName,
-          ));
+          reporter.atNode(
+            variable,
+            _code,
+          );
         }
       }
     }
@@ -76,7 +52,7 @@ class _SimpleLateVisitor extends RecursiveAstVisitor<void> {
   bool _isLazyInitializer(Expression initializer) {
     // Allow function calls, method calls, and complex expressions
     // Disallow simple literals and basic constructors
-    return initializer is! Literal && 
+    return initializer is! Literal &&
            initializer is! ListLiteral &&
            initializer is! SetOrMapLiteral &&
            initializer is! SimpleIdentifier;

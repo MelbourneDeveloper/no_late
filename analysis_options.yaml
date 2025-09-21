@@ -2,4 +2,4 @@ include: package:lints/recommended.yaml
 
 analyzer:
   plugins:
-    - no_late
+    - custom_lint

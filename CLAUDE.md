@@ -9,6 +9,7 @@ The bad late usage example (example/bad_late_usage.dart) has multiple cases wher
 If the analyzer does not recognise these issues as errors, the plugin is not working and you must continue until the do show up.
 
 ## Code Rules
+- Improve code as you work by following these rules, simplifying and removing duplication
 - NO DUPLICATION. Move files, code elements instead of copying them. Search for elements before adding them.
 - NO PLACEHOLDERS!!! If you HAVE TO leave a section blank, fail LOUDLY by throwing an exception.
 - NEVER cast or use the bang operator (!) or `dynamic` type. Always using pattern matching

@@ -1,73 +1,58 @@
-import 'package:no_late/no_late_analyzer.dart';
+import 'package:custom_lint_builder/custom_lint_builder.dart';
+import 'package:no_late/src/simple_rule.dart';
 import 'package:test/test.dart';
-import 'package:analyzer/dart/analysis/utilities.dart';
 
 void main() {
-  group('SimpleLateRule', () {
-    late SimpleLateRule rule;
-
-    setUp(() {
-      rule = SimpleLateRule();
-    });
-
+  group('NoImproperLateUsageRule', () {
     test('should flag late variables without initialization', () {
-      const code = '''
+      final code = '''
 class TestClass {
+  // expect_lint: no_improper_late_usage
   late String name;
+  // expect_lint: no_improper_late_usage
   late int age;
 }
 ''';
 
-      final result = parseString(content: code);
-      final errors = rule.check(result.unit);
-
-      expect(errors, hasLength(2));
-      expect(errors[0].variableName, equals('name'));
-      expect(errors[1].variableName, equals('age'));
-      expect(errors[0].message, contains('declared late but not initialized'));
+      testRule(NoImproperLateUsageRule(), code);
     });
 
     test('should flag late variables with simple literal initialization', () {
-      const code = '''
+      final code = '''
 class TestClass {
+  // expect_lint: no_improper_late_usage
   late String name = "John";
+  // expect_lint: no_improper_late_usage
   late int age = 25;
+  // expect_lint: no_improper_late_usage
   late bool isActive = true;
 }
 ''';
 
-      final result = parseString(content: code);
-      final errors = rule.check(result.unit);
-
-      expect(errors, hasLength(3));
-      expect(errors[0].variableName, equals('name'));
-      expect(errors[1].variableName, equals('age'));
-      expect(errors[2].variableName, equals('isActive'));
-      expect(errors[0].message, contains('simple value'));
+      testRule(NoImproperLateUsageRule(), code);
     });
 
     test('should allow late variables with lazy initialization', () {
-      const code = '''
+      final code = '''
 class TestClass {
   late final String timestamp = DateTime.now().toString();
   late final List<int> numbers = generateNumbers();
   late final Map<String, dynamic> config = loadConfig();
-  
+
   List<int> generateNumbers() => [1, 2, 3];
   Map<String, dynamic> loadConfig() => {};
 }
 ''';
 
-      final result = parseString(content: code);
-      final errors = rule.check(result.unit);
-
-      expect(errors, isEmpty);
+      testRule(NoImproperLateUsageRule(), code);
     });
 
     test('should handle local variables', () {
-      const code = '''
+      final code = '''
 void testFunction() {
+  // expect_lint: no_improper_late_usage
   late String name;
+  // expect_lint: no_improper_late_usage
   late int count = 42;
   late List<String> items = computeItems();
 }
@@ -75,12 +60,7 @@ void testFunction() {
 List<String> computeItems() => [];
 ''';
 
-      final result = parseString(content: code);
-      final errors = rule.check(result.unit);
-
-      expect(errors, hasLength(2)); // name and count should be flagged
-      expect(errors[0].variableName, equals('name'));
-      expect(errors[1].variableName, equals('count'));
+      testRule(NoImproperLateUsageRule(), code);
     });
   });
 }
