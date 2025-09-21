@@ -1,0 +1,10 @@
+name: no_late_analyzer_plugin
+description: Plugin configuration for no_late_analyzer
+version: 1.0.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  no_late_analyzer:
+    path: ../../
