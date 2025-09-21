@@ -1,5 +1,5 @@
 import 'dart:isolate';
-import '../lib/plugin_bootstrap.dart';
+import 'package:no_late_analyzer_plugin/plugin_bootstrap.dart';
 
 void main(List<String> args, SendPort sendPort) {
   start(args, sendPort);
