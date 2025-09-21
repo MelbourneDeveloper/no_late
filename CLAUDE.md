@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The bad late usage example (example/bad_late_usage.dart) has multiple cases where the analyzer should cause linting errors. When running the analyzer, these should show up. And vscode should show these in the Problems window.
 
-If the analyzer does not recognise these issues as errors, the plugin is not working and you must continue until the do show up.
+If the custom lint does not recognise these issues as errors, the plugin is not working and you must continue until the do show up.
 
 ## Code Rules
 - Improve code as you work by following these rules, simplifying and removing duplication
@@ -24,10 +24,11 @@ If the analyzer does not recognise these issues as errors, the plugin is not wor
 - Don't use if statements. Use pattern matching or ternaries instead.
 
 ## Documentation
-Follow the analyzer plugin documentation at analyzerdoc.html carefully.
+Follow the custom lint package documentation here:
+https://github.com/invertase/dart_custom_lint
 
 ## Project Overview
-This is a Dart analyzer plugin that enforces proper usage of the `late` keyword for lazy initialization only. It generates compiler errors when `late` is used improperly (e.g., for separate declaration/initialization or with simple literals).
+This is a Dart custom lint that enforces proper usage of the `late` keyword for lazy initialization only. It generates compiler errors when `late` is used improperly (e.g., for separate declaration/initialization or with simple literals).
 
 Any use of the late keyword that COULD cause an exception is ILLEGAL and causes a static code analysis error
 
