@@ -6,7 +6,7 @@ void main() {
     test('rule is properly configured', () {
       final rule = NoImproperLateUsageRule();
 
-      expect(rule.code.name, equals('no_improper_late_usage'));
+      expect(rule.code.name, equals('no_dangerous_late_usage'));
       expect(rule.code.problemMessage, contains('late'));
       expect(rule.code.errorSeverity.name, equals('ERROR'));
     });

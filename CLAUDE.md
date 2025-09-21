@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## How Doese Claude Know When the Project Is Working?
 
-The bad late usage example (example/bad_late_usage.dart) has multiple cases where the analyzer should cause linting errors. When running the analyzer, these should show up. And vscode should show these in the Problems window.
+The bad late usage example (test_project/lib/main.dart) has multiple cases where the analyzer should cause linting errors. When running the analyzer, these should show up. And vscode should show these in the Problems window.
 
 If the custom lint does not recognise these issues as errors, the plugin is not working and you must continue until the do show up.
 

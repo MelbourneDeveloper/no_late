@@ -9,9 +9,9 @@ class NoImproperLateUsageRule extends DartLintRule {
   NoImproperLateUsageRule() : super(code: _code);
 
   static const _code = LintCode(
-    name: 'no_improper_late_usage',
-    problemMessage: "The 'late' keyword should only be used for lazy initialization. Move the initialization to the declaration or use an expression.",
-    correctionMessage: 'Remove late keyword or use it only for complex lazy initialization.',
+    name: 'no_dangerous_late_usage',
+    problemMessage: "The 'late' keyword should only be used for lazy initialization.",
+    correctionMessage: "Remove the 'late' keyword or move the initialization to the declaration.",
     errorSeverity: ErrorSeverity.ERROR,
   );
 
