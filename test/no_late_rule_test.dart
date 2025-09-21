@@ -1,6 +1,6 @@
+import 'package:no_late/no_late_analyzer.dart';
 import 'package:test/test.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
-import 'package:no_late_analyzer/src/simple_rule.dart';
 
 void main() {
   group('SimpleLateRule', () {
@@ -17,10 +17,10 @@ class TestClass {
   late int age;
 }
 ''';
-      
+
       final result = parseString(content: code);
       final errors = rule.check(result.unit);
-      
+
       expect(errors, hasLength(2));
       expect(errors[0].variableName, equals('name'));
       expect(errors[1].variableName, equals('age'));
@@ -35,10 +35,10 @@ class TestClass {
   late bool isActive = true;
 }
 ''';
-      
+
       final result = parseString(content: code);
       final errors = rule.check(result.unit);
-      
+
       expect(errors, hasLength(3));
       expect(errors[0].variableName, equals('name'));
       expect(errors[1].variableName, equals('age'));
@@ -57,10 +57,10 @@ class TestClass {
   Map<String, dynamic> loadConfig() => {};
 }
 ''';
-      
+
       final result = parseString(content: code);
       final errors = rule.check(result.unit);
-      
+
       expect(errors, isEmpty);
     });
 
@@ -74,10 +74,10 @@ void testFunction() {
 
 List<String> computeItems() => [];
 ''';
-      
+
       final result = parseString(content: code);
       final errors = rule.check(result.unit);
-      
+
       expect(errors, hasLength(2)); // name and count should be flagged
       expect(errors[0].variableName, equals('name'));
       expect(errors[1].variableName, equals('count'));

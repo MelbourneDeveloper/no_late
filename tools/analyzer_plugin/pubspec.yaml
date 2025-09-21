@@ -1,5 +1,5 @@
-name: no_late_analyzer_plugin
-description: Plugin configuration for no_late_analyzer
+name: no_late_plugin
+description: Analyzer plugin for no_late rules
 version: 1.0.0
 publish_to: none
 
@@ -9,3 +9,7 @@ environment:
 dependencies:
   analyzer: ^6.0.0
   analyzer_plugin: ^0.11.0
+  no_late:
+    path: ../..
+dev_dependencies:
+  test: ^1.26.3

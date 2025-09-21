@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## How Doese Claude Know When the Project Is Working?
+
+The bad late usage example (example/bad_late_usage.dart) has multiple cases where the analyzer should cause linting errors. When running the analyzer, these should show up. And vscode should show these in the Problems window.
+
+If the analyzer does not recognise these issues as errors, the plugin is not working and you must continue until the do show up.
+
 ## Code Rules
 - NO DUPLICATION. Move files, code elements instead of copying them. Search for elements before adding them.
 - NO PLACEHOLDERS!!! If you HAVE TO leave a section blank, fail LOUDLY by throwing an exception.

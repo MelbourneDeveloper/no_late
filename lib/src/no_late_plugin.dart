@@ -1,13 +1,12 @@
 import 'dart:isolate';
 import 'package:analyzer/dart/analysis/analysis_context.dart';
-import 'package:analyzer/dart/analysis/analysis_context_collection.dart';
 import 'package:analyzer/dart/analysis/results.dart';
 import 'package:analyzer/file_system/physical_file_system.dart';
 import 'package:analyzer_plugin/plugin/plugin.dart';
 import 'package:analyzer_plugin/protocol/protocol_generated.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 import 'package:analyzer_plugin/starter.dart';
-import 'package:no_late_analyzer/src/simple_rule.dart';
+import 'simple_rule.dart';
 
 void start(List<String> args, SendPort sendPort) {
   ServerPluginStarter(NoLatePlugin()).start(sendPort);
@@ -15,8 +14,6 @@ void start(List<String> args, SendPort sendPort) {
 
 class NoLatePlugin extends ServerPlugin {
   static const String _contactInfo = 'https://github.com/yourname/no_late';
-  
-  late AnalysisContextCollection _contextCollection;
 
   @override
   String get contactInfo => _contactInfo;
@@ -25,7 +22,7 @@ class NoLatePlugin extends ServerPlugin {
   List<String> get fileGlobsToAnalyze => const ['**/*.dart'];
 
   @override
-  String get name => 'no_late_analyzer';
+  String get name => 'no_late';
 
   @override
   String get version => '1.0.0';
@@ -33,105 +30,29 @@ class NoLatePlugin extends ServerPlugin {
   NoLatePlugin() : super(resourceProvider: PhysicalResourceProvider.INSTANCE);
 
   @override
-  Future<void> afterNewContextCollection({
-    required AnalysisContextCollection contextCollection,
-  }) async {
-    _contextCollection = contextCollection;
-    
-    await super.afterNewContextCollection(
-      contextCollection: contextCollection,
-    );
-    
-    for (final context in contextCollection.contexts) {
-      final analyzedFiles = context.contextRoot.analyzedFiles();
-      for (final path in analyzedFiles) {
-        if (path.endsWith('.dart')) {
-          await _analyzeFile(context, path);
-        }
-      }
-    }
-  }
-  
-  @override
-  Future<AnalysisHandleWatchEventsResult> handleAnalysisHandleWatchEvents(
-      AnalysisHandleWatchEventsParams parameters) async {
-    for (final event in parameters.events) {
-      final path = event.path;
-      if (!path.endsWith('.dart')) continue;
-      
-      try {
-        final context = _contextCollection.contextFor(path);
-        await _analyzeFile(context, path);
-      } catch (e) {
-        // Ignore errors
-      }
-    }
-    return AnalysisHandleWatchEventsResult();
-  }
-  
-  @override
-  Future<AnalysisSetPriorityFilesResult> handleAnalysisSetPriorityFiles(
-      AnalysisSetPriorityFilesParams parameters) async {
-    for (final path in parameters.files) {
-      if (!path.endsWith('.dart')) continue;
-      
-      try {
-        final context = _contextCollection.contextFor(path);
-        await _analyzeFile(context, path);
-      } catch (e) {
-        // Ignore errors
-      }
-    }
-    
-    return AnalysisSetPriorityFilesResult();
-  }
-  
-  @override
-  Future<AnalysisUpdateContentResult> handleAnalysisUpdateContent(
-      AnalysisUpdateContentParams parameters) async {
-    final paths = parameters.files.keys.toSet();
-    for (final path in paths) {
-      if (!path.endsWith('.dart')) continue;
-      
-      try {
-        final context = _contextCollection.contextFor(path);
-        await _analyzeFile(context, path);
-      } catch (e) {
-        // Ignore errors
-      }
-    }
-    
-    return AnalysisUpdateContentResult();
-  }
-  
-  @override
   Future<void> analyzeFile({
     required AnalysisContext analysisContext,
     required String path,
   }) async {
-    await _analyzeFile(analysisContext, path);
-  }
-  
-  Future<void> _analyzeFile(AnalysisContext context, String path) async {
     try {
-      final result = await context.currentSession.getResolvedUnit(path);
-      
+      final result = await analysisContext.currentSession.getResolvedUnit(path);
+
       if (result is! ResolvedUnitResult) {
         channel.sendNotification(
           AnalysisErrorsParams(path, []).toNotification(),
         );
         return;
       }
-      
+
       final rule = SimpleLateRule();
       final errors = rule.check(result.unit);
-      
+
       final lineInfo = result.lineInfo;
-      
+
       final analysisErrors = errors.map((error) {
         final startLocation = lineInfo.getLocation(error.offset);
         final endLocation = lineInfo.getLocation(error.offset + error.length);
-        
+
         return AnalysisError(
           AnalysisErrorSeverity.ERROR,
           AnalysisErrorType.LINT,
@@ -146,16 +67,16 @@ class NoLatePlugin extends ServerPlugin {
           ),
           error.message,
           SimpleLateRule.ruleName,
-          correction: 'Consider using final or initializing immediately',
+          correction: 'Use final or initialize immediately instead of late',
           hasFix: false,
         );
       }).toList();
-      
+
       channel.sendNotification(
         AnalysisErrorsParams(path, analysisErrors).toNotification(),
       );
     } catch (e) {
-      // Log errors silently
+      // Handle errors silently for now
     }
   }
 }

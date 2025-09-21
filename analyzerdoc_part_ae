@@ -1,0 +1,500 @@
+      the plugin.
+    </p>
+    
+  <dl><dt class="value">INVALID_OVERLAY_CHANGE</dt><dd>
+        
+        <p>
+          An "analysis.updateContent" request contained a
+          <a href="#type_ChangeContentOverlay">ChangeContentOverlay</a> object
+          that can't be applied. This can happen for two reasons:
+        </p>
+        <ul>
+          <li>
+            there was no preceding
+            <a href="#type_AddContentOverlay">AddContentOverlay</a> and hence no
+            content to which the edits could be applied, or
+          </li>
+          <li>
+            one or more of the specified edits have an offset or length that is
+            out of range.
+          </li>
+        </ul>
+      </dd><dt class="value">INVALID_PARAMETER</dt><dd>
+        
+        <p>
+          One of the method parameters was invalid.
+        </p>
+      </dd><dt class="value">PLUGIN_ERROR</dt><dd>
+        
+        <p>
+          An internal error occurred in the plugin while attempting to respond
+          to a request. Also see the plugin.error notification for errors that
+          occur outside of handling a request.
+        </p>
+      </dd><dt class="value">UNKNOWN_REQUEST</dt><dd>
+        
+        <p>
+          A request was received that the plugin does not recognize, or cannot
+          handle in its current configuration.
+        </p>
+      </dd></dl></dd><dt class="typeDefinition"><a name="type_SourceChange">SourceChange: object</a></dt><dd>
+    <p>
+      A description of a set of edits that implement a single conceptual change.
+    </p>
+    
+  <dl><dt class="field"><b>message: String</b></dt><dd>
+        
+        <p>
+          A human-readable description of the change to be applied.
+        </p>
+        <p>
+          If this change includes multiple edits made for different reasons (such as
+          during a bulk fix operation), the individual items in <tt>edits</tt> may
+          contain more specific descriptions.
+        </p>
+      </dd><dt class="field"><b>edits: List&lt;<a href="#type_SourceFileEdit">SourceFileEdit</a>&gt;</b></dt><dd>
+        
+        <p>
+          A list of the edits used to effect the change, grouped by file.
+        </p>
+      </dd><dt class="field"><b>linkedEditGroups: List&lt;<a href="#type_LinkedEditGroup">LinkedEditGroup</a>&gt;</b></dt><dd>
+        
+        <p>
+          A list of the linked editing groups used to customize the changes that
+          were made.
+        </p>
+      </dd><dt class="field"><b>selection: <a href="#type_Position">Position</a><span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          The position that should be selected after the edits have been
+          applied.
+        </p>
+      </dd><dt class="field"><b>selectionLength: int<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          The length of the selection (starting at Position) that should be selected after
+          the edits have been applied.
+        </p>
+      </dd><dt class="field"><b>id: String<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          The optional identifier of the change kind. The identifier remains
+          stable even if the message changes, or is parameterized.
+        </p>
+      </dd></dl></dd><dt class="typeDefinition"><a name="type_SourceEdit">SourceEdit: object</a></dt><dd>
+    <p>
+      A description of a single change to a single file.
+    </p>
+    
+  <dl><dt class="field"><b>offset: int</b></dt><dd>
+        
+        <p>
+          The offset of the region to be modified.
+        </p>
+      </dd><dt class="field"><b>length: int</b></dt><dd>
+        
+        <p>
+          The length of the region to be modified.
+        </p>
+      </dd><dt class="field"><b>replacement: String</b></dt><dd>
+        
+        <p>
+          The code that is to replace the specified region in the original code.
+        </p>
+      </dd><dt class="field"><b>id: String<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          An identifier that uniquely identifies this source edit from other
+          edits in the same response. This field is omitted unless a containing
+          structure needs to be able to identify the edit for some reason.
+        </p>
+        <p>
+          For example, some refactoring operations can produce edits that might
+          not be appropriate (referred to as potential edits). Such edits will
+          have an id so that they can be referenced. Edits in the same response
+          that do not need to be referenced will not have an id.
+        </p>
+      </dd><dt class="field"><b>description: String<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          A human readable description of the change made by this edit.
+        </p>
+        <p>
+          This description should be short and suitable to use as a heading
+          with changes grouped by it. For example, a change made as part of
+          a quick-fix may use the message "Replace final with var", allowing
+          multiple changes and multiple applications of the fix to be grouped
+          together.
+        </p>
+        <p>
+          This value may be more specific than any value in an enclosing
+          <tt>SourceChange.message</tt> which could contain edits made for
+          different reasons (such as during a bulk fix operation).
+        </p>
+      </dd></dl></dd><dt class="typeDefinition"><a name="type_SourceFileEdit">SourceFileEdit: object</a></dt><dd>
+    <p>
+      A description of a set of changes to a single file.
+    </p>
+    
+  <dl><dt class="field"><b>file: <a href="#type_FilePath">FilePath</a></b></dt><dd>
+        
+        <p>
+          The file containing the code to be modified.
+        </p>
+      </dd><dt class="field"><b><span class="deprecated">fileStamp</span>: long</b></dt><dd>
+        
+        <p>
+          The modification stamp of the file at the moment when the change was
+          created, in milliseconds since the "Unix epoch". Will be -1 if the
+          file did not exist and should be created. The client may use this
+          field to make sure that the file was not changed since then, so it is
+          safe to apply the change.
+        </p>
+      </dd><dt class="field"><b>edits: List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt;</b></dt><dd>
+        
+        <p>
+          A list of the edits used to effect the change.
+        </p>
+      </dd></dl></dd><dt class="typeDefinition"><a name="type_WatchEvent">WatchEvent: object</a></dt><dd>
+    <p>
+      A watch event sent by the server when the file system has been modified.
+    </p>
+    
+  <dl><dt class="field"><b>type: <a href="#type_WatchEventType">WatchEventType</a></b></dt><dd>
+        
+        <p>
+          The type of change represented by this event.
+        </p>
+      </dd><dt class="field"><b>path: <a href="#type_FilePath">FilePath</a></b></dt><dd>
+        
+        <p>
+          The absolute path of the file or directory that changed.
+        </p>
+      </dd></dl></dd><dt class="typeDefinition"><a name="type_WatchEventType">WatchEventType: String</a></dt><dd>
+    <p>
+      An indication of the type of change associated with a watch event.
+    </p>
+    
+  <dl><dt class="value">ADD</dt><dd>
+        
+        <p>
+          An indication that the file or directory was added.
+        </p>
+      </dd><dt class="value">MODIFY</dt><dd>
+        
+        <p>
+          An indication that the file was modified.
+        </p>
+      </dd><dt class="value">REMOVE</dt><dd>
+        
+        <p>
+          An indication that the file or directory was removed.
+        </p>
+      </dd></dl></dd></dl>
+
+  <h2><a name="refactorings">Refactorings</a></h2>
+  <p>
+    This section contains additional information for each kind of refactoring.
+    In addition to a brief description of the refactoring, there is a
+    specification of the feedback that is provided when a refactoring is
+    requested using the
+    <a href="request_edit.getRefactoring">edit.getRefactoring</a> request
+    (designed to improve the UX) and the options that may be provided to
+    <a href="request_edit.getRefactoring">edit.getRefactoring</a>.
+  </p>
+  
+  
+  
+  
+  
+  
+  
+  
+<dl><dt class="refactoring">CONVERT_GETTER_TO_METHOD</dt><dd>
+    <p>
+      Convert a getter into a method by removing the keyword get and adding an
+      empty parameter list.
+    </p>
+    <p>
+      It is an error if the range contains anything other than all or part of
+      the name of a single getter.
+    </p>
+  <h4>Feedback:</h4><p>none</p><h4>Options:</h4><p>none</p></dd><dt class="refactoring">CONVERT_METHOD_TO_GETTER</dt><dd>
+    <p>
+      Convert a method into a getter by adding the keyword get and removing the
+      parameter list.
+    </p>
+    <p>
+      It is an error if the range contains anything other than all or part of
+      the name of a single method or if the method has a non-empty parameter
+      list.
+    </p>
+  <h4>Feedback:</h4><p>none</p><h4>Options:</h4><p>none</p></dd><dt class="refactoring">EXTRACT_LOCAL_VARIABLE</dt><dd>
+    <p>
+      Create a local variable initialized by the expression that covers the
+      specified selection.
+    </p>
+    <p>
+      It is an error if the selection range is not covered by a complete
+      expression.
+    </p>
+    
+    
+  <h4>Feedback:</h4><dl><dt class="field"><b>coveringExpressionOffsets: List&lt;int&gt;<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          The offsets of the expressions that cover the specified selection,
+          from the down most to the up most.
+        </p>
+      </dd><dt class="field"><b>coveringExpressionLengths: List&lt;int&gt;<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          The lengths of the expressions that cover the specified selection,
+          from the down most to the up most.
+        </p>
+      </dd><dt class="field"><b>names: List&lt;String&gt;</b></dt><dd>
+        
+        <p>
+          The proposed names for the local variable.
+        </p>
+      </dd><dt class="field"><b>offsets: List&lt;int&gt;</b></dt><dd>
+        
+        <p>
+          The offsets of the expressions that would be replaced by a reference
+          to the variable.
+        </p>
+      </dd><dt class="field"><b>lengths: List&lt;int&gt;</b></dt><dd>
+        
+        <p>
+          The lengths of the expressions that would be replaced by a reference
+          to the variable. The lengths correspond to the offsets. In other
+          words, for a given expression, if the offset of that expression is
+          offsets[i], then the length of that expression is lengths[i].
+        </p>
+      </dd></dl><h4>Options:</h4><dl><dt class="field"><b>name: String</b></dt><dd>
+        
+        <p>
+          The name that the local variable should be given.
+        </p>
+      </dd><dt class="field"><b>extractAll: bool</b></dt><dd>
+        
+        <p>
+          True if all occurrences of the expression within the scope in which
+          the variable will be defined should be replaced by a reference to the
+          local variable. The expression used to initiate the refactoring will
+          always be replaced.
+        </p>
+      </dd></dl></dd><dt class="refactoring">EXTRACT_METHOD</dt><dd>
+    <p>
+      Create a method whose body is the specified expression or list of
+      statements, possibly augmented with a return statement.
+    </p>
+    <p>
+      It is an error if the range contains anything other than a complete
+      expression (no partial expressions are allowed) or a complete sequence of
+      statements.
+    </p>
+    
+    
+  <h4>Feedback:</h4><dl><dt class="field"><b>offset: int</b></dt><dd>
+        
+        <p>
+          The offset to the beginning of the expression or statements that will
+          be extracted.
+        </p>
+      </dd><dt class="field"><b>length: int</b></dt><dd>
+        
+        <p>
+          The length of the expression or statements that will be extracted.
+        </p>
+      </dd><dt class="field"><b>returnType: String</b></dt><dd>
+        
+        <p>
+          The proposed return type for the method. If the returned element does
+          not have a declared return type, this field will contain an empty
+          string.
+        </p>
+      </dd><dt class="field"><b>names: List&lt;String&gt;</b></dt><dd>
+        
+        <p>
+          The proposed names for the method.
+        </p>
+      </dd><dt class="field"><b>canCreateGetter: bool</b></dt><dd>
+        
+        <p>
+          True if a getter could be created rather than a method.
+        </p>
+      </dd><dt class="field"><b>parameters: List&lt;<a href="#type_RefactoringMethodParameter">RefactoringMethodParameter</a>&gt;</b></dt><dd>
+        
+        <p>
+          The proposed parameters for the method.
+        </p>
+      </dd><dt class="field"><b>offsets: List&lt;int&gt;</b></dt><dd>
+        
+        <p>
+          The offsets of the expressions or statements that would be replaced by
+          an invocation of the method.
+        </p>
+      </dd><dt class="field"><b>lengths: List&lt;int&gt;</b></dt><dd>
+        
+        <p>
+          The lengths of the expressions or statements that would be replaced by
+          an invocation of the method. The lengths correspond to the offsets. In
+          other words, for a given expression (or block of statements), if the
+          offset of that expression is offsets[i], then the length of that
+          expression is lengths[i].
+        </p>
+      </dd></dl><h4>Options:</h4><dl><dt class="field"><b>returnType: String</b></dt><dd>
+        
+        <p>
+          The return type that should be defined for the method.
+        </p>
+      </dd><dt class="field"><b>createGetter: bool</b></dt><dd>
+        
+        <p>
+          True if a getter should be created rather than a method. It is an
+          error if this field is true and the list of parameters is non-empty.
+        </p>
+      </dd><dt class="field"><b>name: String</b></dt><dd>
+        
+        <p>
+          The name that the method should be given.
+        </p>
+      </dd><dt class="field"><b>parameters: List&lt;<a href="#type_RefactoringMethodParameter">RefactoringMethodParameter</a>&gt;</b></dt><dd>
+        
+        <p>
+          The parameters that should be defined for the method.
+        </p>
+        <p>
+          It is an error if a REQUIRED or NAMED parameter follows a POSITIONAL
+          parameter. It is an error if a REQUIRED or POSITIONAL parameter
+          follows a NAMED parameter.
+        </p>
+        <ul>
+          <li>
+            To change the order and/or update proposed parameters, add
+            parameters with the same identifiers as proposed.
+          </li>
+          <li>
+            To add new parameters, omit their identifier.
+          </li>
+          <li>
+            To remove some parameters, omit them in this list.
+          </li>
+        </ul>
+      </dd><dt class="field"><b>extractAll: bool</b></dt><dd>
+        
+        <p>
+          True if all occurrences of the expression or statements should be
+          replaced by an invocation of the method. The expression or statements
+          used to initiate the refactoring will always be replaced.
+        </p>
+      </dd></dl></dd><dt class="refactoring">INLINE_LOCAL_VARIABLE</dt><dd>
+    <p>
+      Inline the initializer expression of a local variable in place of any
+      references to that variable.
+    </p>
+    <p>
+      It is an error if the range contains anything other than all or part of
+      the name of a single local variable.
+    </p>
+    
+  <h4>Feedback:</h4><dl><dt class="field"><b>name: String</b></dt><dd>
+        
+        <p>
+          The name of the variable being inlined.
+        </p>
+      </dd><dt class="field"><b>occurrences: int</b></dt><dd>
+        
+        <p>
+          The number of times the variable occurs.
+        </p>
+      </dd></dl><h4>Options:</h4><p>none</p></dd><dt class="refactoring">INLINE_METHOD</dt><dd>
+    <p>
+      Inline a method in place of one or all references to that method.
+    </p>
+    <p>
+      It is an error if the range contains anything other than all or part of
+      the name of a single method.
+    </p>
+    
+    
+  <h4>Feedback:</h4><dl><dt class="field"><b>className: String<span style="color:#999999"> (optional)</span></b></dt><dd>
+        
+        <p>
+          The name of the class enclosing the method being inlined. If not a
+          class member is being inlined, this field will be absent.
+        </p>
+      </dd><dt class="field"><b>methodName: String</b></dt><dd>
+        
+        <p>
+          The name of the method (or function) being inlined.
+        </p>
+      </dd><dt class="field"><b>isDeclaration: bool</b></dt><dd>
+        
+        <p>
+          True if the declaration of the method is selected and all references
+          should be inlined.
+        </p>
+      </dd></dl><h4>Options:</h4><dl><dt class="field"><b>deleteSource: bool</b></dt><dd>
+        
+        <p>
+          True if the method being inlined should be removed. It is an error if
+          this field is true and inlineAll is false.
+        </p>
+      </dd><dt class="field"><b>inlineAll: bool</b></dt><dd>
+        
+        <p>
+          True if all invocations of the method should be inlined, or false if
+          only the invocation site used to create this refactoring should be
+          inlined.
+        </p>
+      </dd></dl></dd><dt class="refactoring">MOVE_FILE</dt><dd>
+    <p>
+      Move the given file and update all of the references to that file and from
+      it. The move operation is supported in general case - for renaming a file
+      in the same folder, moving it to a different folder or both.
+    </p>
+    <p>
+      The refactoring must be activated before an actual file moving operation
+      is performed.
+    </p>
+    <p>
+      The "offset" and "length" fields from the request are ignored, but the
+      file specified in the request specifies the file to be moved.
+    </p>
+    
+  <h4>Feedback:</h4><p>none</p><h4>Options:</h4><dl><dt class="field"><b>newFile: <a href="#type_FilePath">FilePath</a></b></dt><dd>
+        
+        <p>
+          The new file path to which the given file is being moved.
+        </p>
+      </dd></dl></dd><dt class="refactoring">RENAME</dt><dd>
+    <p>
+      Rename a given element and all of the references to that element.
+    </p>
+    <p>
+      It is an error if the range contains anything other than all or part of
+      the name of a single function (including methods, getters and setters),
+      variable (including fields, parameters and local variables), class or
+      function type.
+    </p>
+    
+    
+  <h4>Feedback:</h4><dl><dt class="field"><b>offset: int</b></dt><dd>
+        
+        <p>
+          The offset to the beginning of the name selected to be renamed.
+        </p>
+      </dd><dt class="field"><b>length: int</b></dt><dd>
+        
+        <p>
+          The length of the name selected to be renamed.
+        </p>
+      </dd><dt class="field"><b>elementKindName: String</b></dt><dd>
+        
+        <p>
+          The human-readable description of the kind of element being renamed
+          (such as “class” or “function type alias”).
+        </p>
+      </dd><dt class="field"><b>oldName: String</b></dt><dd>
