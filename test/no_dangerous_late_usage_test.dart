@@ -1,7 +1,7 @@
-import 'package:test/test.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
+import 'package:test/test.dart';
 
 void main() {
   group('NoDangerousLateUsageRule', () {
@@ -101,9 +101,8 @@ List<VariableDeclarationList> _findLateVariables(CompilationUnit unit) {
 }
 
 class _LateVisitor extends RecursiveAstVisitor<void> {
-  final List<VariableDeclarationList> lateVariables;
-
   _LateVisitor(this.lateVariables);
+  final List<VariableDeclarationList> lateVariables;
 
   @override
   void visitVariableDeclarationList(VariableDeclarationList node) {

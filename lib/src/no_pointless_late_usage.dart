@@ -6,12 +6,13 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// Detects pointless usage of 'late' keyword with simple initializers.
 /// Flags late variables initialized with literals or simple identifiers.
 class NoPointlessLateUsageRule extends DartLintRule {
-  NoPointlessLateUsageRule() : super(code: _code);
+  const NoPointlessLateUsageRule() : super(code: _code);
 
   static const _code = LintCode(
     name: 'no_pointless_late_usage',
     problemMessage: "Using 'late' with simple values provides no benefit.",
-    correctionMessage: "Remove 'late' for simple literal or identifier initialization.",
+    correctionMessage:
+        "Remove 'late' for simple literal or identifier initialization.",
     errorSeverity: ErrorSeverity.ERROR,
   );
 
@@ -34,10 +35,9 @@ class NoPointlessLateUsageRule extends DartLintRule {
     });
   }
 
-  bool _isSimpleInitializer(Expression initializer) {
-    return initializer is Literal ||
-           initializer is ListLiteral ||
-           initializer is SetOrMapLiteral ||
-           initializer is SimpleIdentifier;
-  }
+  bool _isSimpleInitializer(Expression initializer) =>
+      initializer is Literal ||
+      initializer is ListLiteral ||
+      initializer is SetOrMapLiteral ||
+      initializer is SimpleIdentifier;
 }

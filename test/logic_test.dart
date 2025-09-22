@@ -11,8 +11,8 @@ void main() {
     late NoPointlessLateUsageRule pointlessRule;
 
     setUp(() {
-      dangerousRule = NoDangerousLateUsageRule();
-      pointlessRule = NoPointlessLateUsageRule();
+      dangerousRule = const NoDangerousLateUsageRule();
+      pointlessRule = const NoPointlessLateUsageRule();
     });
 
     test('dangerous rule has correct configuration', () {
@@ -94,7 +94,8 @@ class Test {
 
       expect(lateVars.length, equals(2));
 
-      // Both should be method invocations or property access (PrefixedIdentifier is treated as property access)
+      // Both should be method invocations or property access
+      //(PrefixedIdentifier is treated as property access)
       expect(lateVars[0].variables[0].initializer, isA<MethodInvocation>());
       expect(lateVars[1].variables[0].initializer, isA<PrefixedIdentifier>());
     });
@@ -122,15 +123,25 @@ class Test {
       expect(lateVars.length, equals(11));
 
       // Test the _isLazyInitializer logic directly
-      final badInitializers = lateVars.take(7).map((v) => v.variables[0].initializer!);
-      final goodInitializers = lateVars.skip(7).map((v) => v.variables[0].initializer!);
+      final badInitializers =
+          lateVars.take(7).map((v) => v.variables[0].initializer!);
+      final goodInitializers =
+          lateVars.skip(7).map((v) => v.variables[0].initializer!);
 
       for (final init in badInitializers) {
-        expect(_shouldBeFlagged(init), isTrue, reason: 'Should flag: ${init.runtimeType}');
+        expect(
+          _shouldBeFlagged(init),
+          isTrue,
+          reason: 'Should flag: ${init.runtimeType}',
+        );
       }
 
       for (final init in goodInitializers) {
-        expect(_shouldBeFlagged(init), isFalse, reason: 'Should allow: ${init.runtimeType}');
+        expect(
+          _shouldBeFlagged(init),
+          isFalse,
+          reason: 'Should allow: ${init.runtimeType}',
+        );
       }
     });
   });
@@ -144,19 +155,17 @@ List<VariableDeclarationList> _findLateVariables(CompilationUnit unit) {
   return lateVars;
 }
 
-bool _shouldBeFlagged(Expression initializer) {
-  // Mirror the logic from NoPointlessLateUsageRule._isSimpleInitializer
-  // A variable should be flagged if it's a simple literal or identifier
-  return initializer is Literal ||
-         initializer is ListLiteral ||
-         initializer is SetOrMapLiteral ||
-         initializer is SimpleIdentifier;
-}
+bool _shouldBeFlagged(Expression initializer) =>
+    // Mirror the logic from NoPointlessLateUsageRule._isSimpleInitializer
+    // A variable should be flagged if it's a simple literal or identifier
+    initializer is Literal ||
+    initializer is ListLiteral ||
+    initializer is SetOrMapLiteral ||
+    initializer is SimpleIdentifier;
 
 class _LateVisitor extends RecursiveAstVisitor<void> {
-  final List<VariableDeclarationList> lateVariables;
-
   _LateVisitor(this.lateVariables);
+  final List<VariableDeclarationList> lateVariables;
 
   @override
   void visitVariableDeclarationList(VariableDeclarationList node) {
