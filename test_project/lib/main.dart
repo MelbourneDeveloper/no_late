@@ -19,7 +19,7 @@ class BadLateExample {
   }
 
   Future<void> initStateAsync() async {
-    // OK: these are ok because even if the call fails, you won't be able to 
+    // OK: these are ok because even if the call fails, you won't be able to
     // access the variable anyway
     late var builtString = await buildAsync();
     late final buildString2 = await buildAsync();

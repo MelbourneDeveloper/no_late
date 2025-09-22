@@ -1,138 +1,117 @@
-# No Late Analyzer
+# no_late
 
-A Dart analyzer plugin that enforces proper usage of the `late` keyword for lazy initialization only. This plugin will generate compiler errors if you use `late` in any other way than just lazy initialization.
+[![pub package](https://img.shields.io/pub/v/no_late.svg)](https://pub.dev/packages/no_late)
+[![License: BSD-3](https://img.shields.io/badge/license-BSD--3-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 
-## What This Plugin Does
+**Stop `LateInitializationError` at compile time.**
 
-This analyzer plugin detects and flags improper usage of the `late` keyword, specifically:
+Dart analyzer plugin that bans unsafe `late` usage. Only allows `late` for lazy initialization—everything else is a compile error.
 
-1. **Separate declaration and initialization** - Declaring a `late` variable without initialization and then initializing it later (e.g., in `initState`)
-2. **Simple literal initialization** - Using `late` with simple literals like strings, numbers, or booleans
+## The Problem
 
-## Bad Usage Examples (Will Generate Errors)
+`late` without immediate initialization causes runtime exceptions:
 
 ```dart
-class BadExample {
-  // BAD: Separate declaration and initialization
-  late String userName;
-  late int userId;
-  
-  // BAD: Simple literal initialization
-  late String title = "Hello World";
-  late int count = 42;
-  late bool isActive = true;
-  
+late String name;  // 💣 Bomb waiting to explode
+String greet() => 'Hello $name';  // 💥 LateInitializationError!
+```
+
+## The Solution
+
+This plugin makes unsafe `late` usage a **compile-time error**:
+
+```dart
+late String name;  // ❌ ERROR: Uninitialized late variable
+```
+
+## What's Blocked
+
+```dart
+// ❌ Uninitialized late
+late String userName;
+
+// ❌ Simple literals (no lazy benefit)
+late String title = "Hello";
+late int count = 42;
+
+// ❌ Simple identifiers
+late var copy = originalValue;
+```
+
+## What's Allowed
+
+```dart
+// ✅ Expensive computations
+late final primes = calculatePrimes(1000000);
+
+// ✅ Method/constructor calls
+late final db = Database.connect();
+late final timestamp = DateTime.now();
+
+// ✅ Complex expressions
+late final sum = numbers.fold(0, (a, b) => a + b);
+```
+
+## Real Example: Flutter
+
+### ❌ Dangerous Pattern
+
+```dart
+class _MyWidgetState extends State<MyWidget> {
+  late AnimationController controller;
+
+  @override
   void initState() {
-    // BAD: Initializing late variables after declaration
-    userName = "John Doe";
-    userId = 123;
+    super.initState();
+    controller = AnimationController(vsync: this);
   }
+  // If initState fails, controller.dispose() crashes
 }
 ```
 
-## Good Usage Examples (Allowed)
+### ✅ Safe Pattern
 
 ```dart
-class GoodExample {
-  // GOOD: Lazy initialization with computed values
-  late final String complexString = _computeComplexString();
-  late final List<int> expensiveList = _generateExpensiveList();
-  late final DateTime timestamp = DateTime.now();
-  late final Random random = Random();
-  
-  String _computeComplexString() {
-    return "Computed: ${DateTime.now().millisecondsSinceEpoch}";
+class _MyWidgetState extends State<MyWidget> {
+  AnimationController? controller;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = AnimationController(vsync: this);
   }
-  
-  List<int> _generateExpensiveList() {
-    return List.generate(1000, (index) => index * index);
+
+  @override
+  void dispose() {
+    controller?.dispose();  // Null-safe
+    super.dispose();
   }
 }
 ```
 
-## Installation
+## Migration
 
-### Method 1: As an Analyzer Plugin
+| Pattern | Before | After |
+|---------|--------|-------|
+| Uninitialized | `late T value;` | `T? value;` |
+| Simple literal | `late T value = literal;` | `T value = literal;` |
+| Lazy computation | `late T value = compute();` | Keep as-is ✅ |
 
-1. Add this plugin to your project:
-
-```yaml
-dev_dependencies:
-  no_late_analyzer: ^1.0.0
-```
-
-2. Create a `tools/analyzer_plugin/pubspec.yaml` file in your project:
-
-```yaml
-name: analyzer_plugin
-description: Analyzer plugin configuration
-
-environment:
-  sdk: '>=3.0.0 <4.0.0'
-
-dependencies:
-  no_late_analyzer: ^1.0.0
-```
-
-3. Create a `tools/analyzer_plugin/bin/plugin.dart` file:
+## Suppress
 
 ```dart
-import 'dart:isolate';
-import 'package:no_late_analyzer/no_late_analyzer.dart';
+// ignore: no_late
+late String legacy;  // Single line
 
-void main(List<String> args, SendPort sendPort) {
-  start(args, sendPort);
-}
-```
-
-4. Run `dart pub get` in both your main project and the `tools/analyzer_plugin` directory.
-
-### Method 2: Standalone Usage
-
-You can also use the rule directly in your code analysis:
-
-```dart
-import 'package:no_late_analyzer/no_late_analyzer.dart';
-import 'package:analyzer/dart/analysis/utilities.dart';
-
-void analyzeCode(String code) {
-  final result = parseString(content: code);
-  final rule = NoLateRule();
-  final errors = rule.check(result.unit);
-  
-  for (final error in errors) {
-    print('Error: ${error.message} at line ${error.offset}');
-  }
-}
+// ignore_for_file: no_late  // Entire file
 ```
 
 ## Error Messages
 
-When improper `late` usage is detected, you'll see error messages like:
-
 ```
-The 'late' keyword should only be used for lazy initialization. Separate declaration and initialization is not allowed.
+Uninitialized 'late' variables risk LateInitializationError
 ```
 
-## Why This Matters
-
-The `late` keyword in Dart is intended for lazy initialization - deferring the computation of a value until it's first accessed. Using it for other purposes can:
-
-1. **Confuse developers** about the intent of the code
-2. **Hide initialization bugs** where variables might be accessed before being set
-3. **Reduce performance** by adding unnecessary null checks
-4. **Make code harder to reason about**
-
-This analyzer helps enforce the intended usage pattern and keeps your code clean and performant.
-
-## Testing
-
-Run the tests with:
-
-```bash
-dart test
 ```
-
-## License
-
-MIT License - see LICENSE file for details.
+Simple literals don't benefit from lazy initialization
+```

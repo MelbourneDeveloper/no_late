@@ -1,6 +1,10 @@
 name: no_late
-description: A custom lint package that enforces proper usage of the 'late' keyword for lazy initialization only
-version: 1.0.0
+description: Dart analyzer plugin that prevents LateInitializationError by enforcing safe late keyword usage for lazy initialization only.
+version: 0.1.0
+homepage: https://github.com/christianfindlay/no_late
+repository: https://github.com/christianfindlay/no_late
+issue_tracker: https://github.com/christianfindlay/no_late/issues
+documentation: https://github.com/christianfindlay/no_late#readme
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
@@ -15,3 +19,21 @@ dev_dependencies:
   custom_lint: ^0.6.10
   lints: ^3.0.0
   test: ^1.24.0
+
+topics:
+  - dart
+  - analyzer
+  - lint
+  - static-analysis
+  - late
+  - safety
+  - plugin
+  - custom-lint
+
+funding:
+  - https://github.com/sponsors/christianfindlay
+
+platforms:
+  linux:
+  macos:
+  windows:

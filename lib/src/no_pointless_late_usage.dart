@@ -6,6 +6,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// Detects pointless usage of 'late' keyword with simple initializers.
 /// Flags late variables initialized with literals or simple identifiers.
 class NoPointlessLateUsageRule extends DartLintRule {
+  /// Creates a new [NoPointlessLateUsageRule] instance.
   const NoPointlessLateUsageRule() : super(code: _code);
 
   static const _code = LintCode(

@@ -5,6 +5,7 @@ import 'package:custom_lint_builder/custom_lint_builder.dart';
 /// Detects dangerous usage of 'late' keyword that can cause runtime errors.
 /// Flags uninitialized late variables.
 class NoDangerousLateUsageRule extends DartLintRule {
+  /// Creates a new [NoDangerousLateUsageRule] instance.
   const NoDangerousLateUsageRule() : super(code: _code);
 
   static const _code = LintCode(
