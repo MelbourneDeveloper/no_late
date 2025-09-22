@@ -4,7 +4,8 @@ void testFunction() {
   // expect_lint: no_improper_late_usage
   late String name;
   // expect_lint: no_improper_late_usage
-  late const count = 42;
+  // ignore: prefer_const_declarations
+  late final count = 42;
   late final items = computeItems();
 }
 
