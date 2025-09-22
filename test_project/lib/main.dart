@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, await_in_late_local_variable_initializer
+
 class BadLateExample {
   // BAD: Separate declaration and initialization
   late String userName;
@@ -16,7 +18,16 @@ class BadLateExample {
     userId = 123;
   }
 
-  String build() {
-    return 'User: $userName, ID: $userId, Count: $count, Active: $isActive';
+  Future<void> initStateAsync() async {
+    // OK: these are ok because even if the call fails, you won't be able to 
+    // access the variable anyway
+    late var builtString = await buildAsync();
+    late final buildString2 = await buildAsync();
   }
+
+  String build() =>
+      'User: $userName, ID: $userId, Count: $count, Active: $isActive';
+
+  Future<String> buildAsync() => Future.value(
+      'User: $userName, ID: $userId, Count: $count, Active: $isActive');
 }
