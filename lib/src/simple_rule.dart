@@ -23,12 +23,12 @@ class NoImproperLateUsageRule extends DartLintRule {
   ) {
     context.registry.addVariableDeclarationList((node) {
       if (node.lateKeyword != null) {
-        _checkLateUsage(node, reporter);
+        checkLateUsage(node, reporter);
       }
     });
   }
 
-  void _checkLateUsage(VariableDeclarationList node, ErrorReporter reporter) {
+  void checkLateUsage(VariableDeclarationList node, ErrorReporter reporter) {
     for (final variable in node.variables) {
       if (variable.initializer == null) {
         // This is a late declaration without initialization - NOT ALLOWED

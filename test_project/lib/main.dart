@@ -19,6 +19,4 @@ class BadLateExample {
   String build() {
     return 'User: $userName, ID: $userId, Count: $count, Active: $isActive';
   }
-
-
 }
