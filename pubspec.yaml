@@ -1,6 +1,6 @@
 name: no_late
 description: Dart analyzer plugin that prevents LateInitializationError by enforcing safe late keyword usage for lazy initialization only.
-version: 0.1.0
+version: 0.2.0
 homepage: https://github.com/MelbourneDeveloper/no_late
 repository: https://github.com/MelbourneDeveloper/no_late
 
