@@ -2,7 +2,7 @@
 
 **Stop `LateInitializationError` at compile time.**
 
-Dart analyzer plugin that bans unsafe `late` usage. Only allows `late` for lazy initialization—everything else is a compile error.
+Dart analyzer plugin that bans unsafe `late` usage. Only allows `late` for lazy initialization. Everything else is a compile error.
 
 ## The Problem
 
@@ -19,6 +19,16 @@ This plugin makes unsafe `late` usage a **compile-time error**:
 
 ```dart
 late String name;  // ❌ ERROR: Uninitialized late variable
+```
+
+## Quick Start
+
+Just add the package and put this in your analysis_options
+
+```yaml
+analyzer:
+  plugins:
+    - custom_lint
 ```
 
 ## What's Blocked
