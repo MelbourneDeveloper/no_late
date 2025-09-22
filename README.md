@@ -1,8 +1,5 @@
 # no_late
 
-[![pub package](https://img.shields.io/pub/v/no_late.svg)](https://pub.dev/packages/no_late)
-[![License: BSD-3](https://img.shields.io/badge/license-BSD--3-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-
 **Stop `LateInitializationError` at compile time.**
 
 Dart analyzer plugin that bans unsafe `late` usage. Only allows `late` for lazy initialization—everything else is a compile error.
@@ -96,22 +93,3 @@ class _MyWidgetState extends State<MyWidget> {
 | Uninitialized | `late T value;` | `T? value;` |
 | Simple literal | `late T value = literal;` | `T value = literal;` |
 | Lazy computation | `late T value = compute();` | Keep as-is ✅ |
-
-## Suppress
-
-```dart
-// ignore: no_late
-late String legacy;  // Single line
-
-// ignore_for_file: no_late  // Entire file
-```
-
-## Error Messages
-
-```
-Uninitialized 'late' variables risk LateInitializationError
-```
-
-```
-Simple literals don't benefit from lazy initialization
-```
