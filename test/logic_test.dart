@@ -1,20 +1,28 @@
 import 'package:analyzer/dart/analysis/utilities.dart';
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/ast/visitor.dart';
-import 'package:no_late/src/simple_rule.dart';
+import 'package:no_late/src/no_dangerous_late_usage.dart';
+import 'package:no_late/src/no_pointless_late_usage.dart';
 import 'package:test/test.dart';
 
 void main() {
   group('Late Usage Logic Tests', () {
-    late NoImproperLateUsageRule rule;
+    late NoDangerousLateUsageRule dangerousRule;
+    late NoPointlessLateUsageRule pointlessRule;
 
     setUp(() {
-      rule = NoImproperLateUsageRule();
+      dangerousRule = NoDangerousLateUsageRule();
+      pointlessRule = NoPointlessLateUsageRule();
     });
 
-    test('rule has correct configuration', () {
-      expect(rule.code.name, equals('no_dangerous_late_usage'));
-      expect(rule.code.problemMessage, contains('late'));
+    test('dangerous rule has correct configuration', () {
+      expect(dangerousRule.code.name, equals('no_dangerous_late_usage'));
+      expect(dangerousRule.code.problemMessage, contains('Uninitialized'));
+    });
+
+    test('pointless rule has correct configuration', () {
+      expect(pointlessRule.code.name, equals('no_pointless_late_usage'));
+      expect(pointlessRule.code.problemMessage, contains('simple values'));
     });
 
     test('identifies uninitialized late variables correctly', () {
@@ -137,8 +145,8 @@ List<VariableDeclarationList> _findLateVariables(CompilationUnit unit) {
 }
 
 bool _shouldBeFlagged(Expression initializer) {
-  // Mirror the logic from NoImproperLateUsageRule._isLazyInitializer
-  // A variable should be flagged if it's NOT a lazy initializer (is a literal or simple identifier)
+  // Mirror the logic from NoPointlessLateUsageRule._isSimpleInitializer
+  // A variable should be flagged if it's a simple literal or identifier
   return initializer is Literal ||
          initializer is ListLiteral ||
          initializer is SetOrMapLiteral ||
